@@ -1,0 +1,31 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+$	src/cljs/data_binding_cljs/core.cljs	/^(def $ jquery\/$)$/;"	f
+$	src/data_binding_cljs/core.cljs	/^(def $ jq\/$)$/;"	f
+$main	src/cljs/data_binding_cljs/core.cljs	/^(def $main ($ "#main"))$/;"	f
+$main	src/data_binding_cljs/core.cljs	/^(def $main ($ "#main"))$/;"	f
+Eatchar	/Users/simon/.vim/ftplugin/html.vim	/^func Eatchar(pat)$/;"	f
+Person	src/cljs/data_binding_cljs/core.cljs	/^(defrecord Person [first last id])$/;"	f
+Person	src/data_binding_cljs/core.cljs	/^(defrecord Person [first last id])$/;"	f
+WrappedAtom	src/data_binding_cljs/core.cljs	/^(deftype WrappedAtom [state meta validator watches]$/;"	f
+atom	src/data_binding_cljs/core.cljs	/^(defn atom$/;"	f
+data-binding-cljs	project.clj	/^(defproject data-binding-cljs "0.1.0-SNAPSHOT"$/;"	f
+deftemplate	/Users/simon/Code/data-binding-cljs/src/cljs/data-binding-cljs/macros.clj	/^(defmacro deftemplate$/;"	f
+deftemplate	src/clj/data_binding_cljs/macros.clj	/^(defmacro deftemplate$/;"	f
+deftemplate	src/cljs/data-binding-cljs/macros.cljs	/^(defmacro deftemplate$/;"	f
+deftemplate	src/data_binding_cljs/macros.clj	/^(defmacro deftemplate$/;"	f
+exist?	src/data_binding_cljs/core.cljs	/^(defn exist?$/;"	f
+full-name	src/cljs/data_binding_cljs/core.cljs	/^(defn full-name [person]$/;"	f
+full-name	src/data_binding_cljs/core.cljs	/^(defn full-name [person]$/;"	f
+greeting-template	src/cljs/data_binding_cljs/core.cljs	/^(deftemplate greeting-template$/;"	f
+greeting-template	src/data_binding_cljs/core.cljs	/^(deftemplate greeting-template$/;"	f
+log	src/cljs/data_binding_cljs/core.cljs	/^(defn log [& stuff]$/;"	f
+log	src/data_binding_cljs/core.cljs	/^(defn log [& stuff]$/;"	f
+me	src/data_binding_cljs/core.cljs	/^(def me (Person. (atom "Simon") (atom "Hicks") 1))$/;"	f
+princess	src/data_binding_cljs/core.cljs	/^(def princess (Person. (atom "Linda") (atom "Guyse") 2))$/;"	f
+re-render-template	src/data_binding_cljs/core.cljs	/^(defn re-render-template [template-id template-fn template-args]$/;"	f
+render	src/data_binding_cljs/macros.clj	/^(defmacro render$/;"	f
