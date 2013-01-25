@@ -1,7 +1,6 @@
 (ns data-binding-cljs.core
   (:require [jayq.core :as jq]
             [hiccups.runtime :as hiccups])
-  (:refer-clojure :exclude [atom])
   (:use-macros [hiccups.core :only (html)]
                [data-binding-cljs.macros :only (deftemplate render)]))
 
@@ -9,7 +8,45 @@
 ;
 ; - split this out into utils, framework and application code
 ; - refactor it so it's not quite so ugly
-; - find a way to wrap atom without duplicating the entire of Atom
+
+; PLAN
+;
+; data-binding through the 'data-bind' macro/function
+;
+;   (data-bind [selector1 binding-function1
+;               selector2 binding-function2]
+;     [:div
+;      ...])
+;
+; should be able to use this inside a render expression or as part of a template... If possible,
+; I'd like to change deftemplate to make this possible
+;
+;     (deftemplate user-status
+;       [user]
+;       (data-bind ['#status' (partial swap! (:status user))]
+;         [:form
+;          [:input#status]]))
+;
+; but if that doesn't work, at the very least this:
+;
+;     (deftemplate user-status*
+;       [user]
+;       [:form
+;        [:input#status]]))
+;
+;     (defn user-status
+;       [user]
+;       (data-bind ['#status' (partial swap! (:status user))]
+;         (user-status* user)))
+;
+; REQUIREMENTS
+;
+; - Must be templating language independent
+; - Must handle a deref'd Bindable and a bound Bindable in the same template without an infinite loop
+; - Must support all types of input, textarea, etc. 
+; - Should replace all the current state of the inputs, textarea, etc. on rerender
+; - Should support destructuring (will need to replace the strings/keywords with valid symbols before
+;   using destructure, but it should work!)
 
 ; Core framework code
 
@@ -35,7 +72,7 @@
   (let [selector (str "[data-templateuuid='" template-id "']")]
     (. ($ selector) (replaceWith (fn [] (render template-fn template-args))))))
 
-(deftype WrappedAtom [state meta validator watches]
+(deftype Bindable [state meta validator watches]
   IEquiv
   (-equiv [o other] (identical? o other))
 
@@ -58,11 +95,11 @@
 
   ^:deprecation-nowarn IPrintable
   (-pr-seq [a opts]
-    (concat  ["#<WrappedAtom: "] (-pr-seq state opts) ">"))
+    (concat  ["#<Bindable: "] (-pr-seq state opts) ">"))
 
   IPrintWithWriter
   (-pr-writer [a writer opts]
-    (-write writer "#<WrappedAtom: ")
+    (-write writer "#<Bindable: ")
     (-pr-writer state writer opts)
     (-write writer ">"))
 
@@ -78,11 +115,11 @@
   IHash
   (-hash [this] (goog.getUid this)))
 
-(defn atom
+(defn bindable
   ([x]
-    (WrappedAtom. x nil nil nil))
+    (Bindable. x nil nil nil))
   ([x & {:keys [meta validator]}]
-    (WrappedAtom. x meta validator nil)))
+    (Bindable. x meta validator nil)))
 
 
 ; Application specific code
@@ -99,8 +136,8 @@
 
 (def $main ($ "#main"))
 
-(def me (Person. (atom "Simon") (atom "Hicks") 1))
-(def princess (Person. (atom "Linda") (atom "Guyse") 2))
+(def me (Person. (bindable "Simon") (bindable "Hicks") 1))
+(def princess (Person. (bindable "Linda") (bindable "Guyse") 2))
 
 (let [node1 (render greeting-template [me])
       node2 (render greeting-template [princess])]
