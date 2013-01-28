@@ -6,33 +6,12 @@
 !_TAG_PROGRAM_VERSION	5.8	//
 $	src/cljs/data_binding_cljs/core.cljs	/^(def $ jquery\/$)$/;"	f
 $main	src/cljs/data_binding_cljs/core.cljs	/^(def $main ($ "#main"))$/;"	f
-$main	src/data_binding_cljs/core.cljs	/^(def $main (jq\/$ "#main"))$/;"	f
-Bindable	src/data_binding_cljs/core.cljs	/^(deftype Bindable [state meta validator watches]$/;"	f
 Eatchar	/Users/simon/.vim/ftplugin/html.vim	/^func Eatchar(pat)$/;"	f
-IBindable	src/data_binding_cljs/core.cljs	/^(defprotocol IBindable$/;"	f
 Person	src/cljs/data_binding_cljs/core.cljs	/^(defrecord Person [first last id])$/;"	f
-Person	src/data_binding_cljs/core.cljs	/^(defrecord Person [first last])$/;"	f
-apply-binding	src/data_binding_cljs/core.cljs	/^(defn apply-binding$/;"	f
-apply-single-binding	src/data_binding_cljs/core.cljs	/^(defmethod apply-single-binding :default$/;"	f
-apply-single-binding	src/data_binding_cljs/core.cljs	/^(defmethod apply-single-binding [:INPUT :text]$/;"	f
-apply-single-binding	src/data_binding_cljs/core.cljs	/^(defmulti apply-single-binding binding-type :default :default)$/;"	f
-bindable	src/data_binding_cljs/core.cljs	/^(defn bindable$/;"	f
-binding-type	src/data_binding_cljs/core.cljs	/^(defn binding-type$/;"	f
-data-binding	src/data_binding_cljs/macros.clj	/^(defmacro data-binding$/;"	f
 data-binding-cljs	project.clj	/^(defproject data-binding-cljs "0.1.0-SNAPSHOT"$/;"	f
 deftemplate	/Users/simon/Code/data-binding-cljs/src/cljs/data-binding-cljs/macros.clj	/^(defmacro deftemplate$/;"	f
 deftemplate	src/clj/data_binding_cljs/macros.clj	/^(defmacro deftemplate$/;"	f
 deftemplate	src/cljs/data-binding-cljs/macros.cljs	/^(defmacro deftemplate$/;"	f
-deftemplate	src/data_binding_cljs/macros.clj	/^(defmacro deftemplate$/;"	f
-exist?	src/data_binding_cljs/core.cljs	/^(defn exist?$/;"	f
 full-name	src/cljs/data_binding_cljs/core.cljs	/^(defn full-name [person]$/;"	f
-full-name	src/data_binding_cljs/core.cljs	/^(defn full-name [person]$/;"	f
 greeting-template	src/cljs/data_binding_cljs/core.cljs	/^(deftemplate greeting-template$/;"	f
-greeting-template	src/data_binding_cljs/core.cljs	/^(defn greeting-template$/;"	f
 log	src/cljs/data_binding_cljs/core.cljs	/^(defn log [& stuff]$/;"	f
-log	src/data_binding_cljs/core.cljs	/^(defn log [& stuff]$/;"	f
-me	src/data_binding_cljs/core.cljs	/^(def me (Person. (bindable "Simon") (bindable "Hicks") 1))$/;"	f
-princess	src/data_binding_cljs/core.cljs	/^(def princess (Person. (bindable "Linda") (bindable "Guyse") 2))$/;"	f
-re-render-template	src/data_binding_cljs/core.cljs	/^(defn re-render-template [template-id template-fn]$/;"	f
-render	src/data_binding_cljs/macros.clj	/^(defmacro render$/;"	f
-render*	src/data_binding_cljs/macros.clj	/^(defmacro render*$/;"	f

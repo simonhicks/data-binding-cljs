@@ -31,10 +31,10 @@ hiccups.runtime.xml_mode_QMARK_ = (function xml_mode_QMARK_(){
 return cljs.core._EQ_.call(null,hiccups.runtime._STAR_html_mode_STAR_,"\uFDD0'xml");
 });
 hiccups.runtime.in_mode = (function in_mode(mode,f){
-var _STAR_html_mode_STAR_43144 = hiccups.runtime._STAR_html_mode_STAR_;
+var _STAR_html_mode_STAR_15460 = hiccups.runtime._STAR_html_mode_STAR_;
 try{hiccups.runtime._STAR_html_mode_STAR_ = mode;
 return f.call(null);
-}finally {hiccups.runtime._STAR_html_mode_STAR_ = _STAR_html_mode_STAR_43144;
+}finally {hiccups.runtime._STAR_html_mode_STAR_ = _STAR_html_mode_STAR_15460;
 }});
 /**
 * Change special characters into HTML character entities.
@@ -53,10 +53,10 @@ if(cljs.core.truth_(hiccups.runtime.xml_mode_QMARK_.call(null)))
 hiccups.runtime.xml_attribute = (function xml_attribute(name,value){
 return [cljs.core.str(" "),cljs.core.str(hiccups.runtime.as_str.call(null,name)),cljs.core.str("=\""),cljs.core.str(hiccups.runtime.escape_html.call(null,value)),cljs.core.str("\"")].join('');
 });
-hiccups.runtime.render_attribute = (function render_attribute(p__43146){
-var vec__43148 = p__43146;
-var name = cljs.core.nth.call(null,vec__43148,0,null);
-var value = cljs.core.nth.call(null,vec__43148,1,null);
+hiccups.runtime.render_attribute = (function render_attribute(p__15462){
+var vec__15464 = p__15462;
+var name = cljs.core.nth.call(null,vec__15464,0,null);
+var value = cljs.core.nth.call(null,vec__15464,1,null);
 if(value === true)
 {if(cljs.core.truth_(hiccups.runtime.xml_mode_QMARK_.call(null)))
 {return hiccups.runtime.xml_attribute.call(null,name,name);
@@ -81,10 +81,10 @@ return cljs.core.apply.call(null,cljs.core.str,cljs.core.sort.call(null,cljs.cor
 /**
 * Ensure a tag vector is of the form [tag-name attrs content].
 */
-hiccups.runtime.normalize_element = (function normalize_element(p__43149){
-var vec__43152 = p__43149;
-var tag = cljs.core.nth.call(null,vec__43152,0,null);
-var content = cljs.core.nthnext.call(null,vec__43152,1);
+hiccups.runtime.normalize_element = (function normalize_element(p__15465){
+var vec__15468 = p__15465;
+var tag = cljs.core.nth.call(null,vec__15468,0,null);
+var content = cljs.core.nthnext.call(null,vec__15468,1);
 if(!((function (){var or__3824__auto__ = cljs.core.keyword_QMARK_.call(null,tag);
 if(or__3824__auto__)
 {return or__3824__auto__;
@@ -100,11 +100,11 @@ if(or__3824__auto____$1)
 {throw [cljs.core.str(tag),cljs.core.str(" is not a valid tag name")].join('');
 } else
 {}
-var vec__43153 = cljs.core.re_matches.call(null,hiccups.runtime.re_tag,hiccups.runtime.as_str.call(null,tag));
-var _ = cljs.core.nth.call(null,vec__43153,0,null);
-var tag__$1 = cljs.core.nth.call(null,vec__43153,1,null);
-var id = cljs.core.nth.call(null,vec__43153,2,null);
-var class$ = cljs.core.nth.call(null,vec__43153,3,null);
+var vec__15469 = cljs.core.re_matches.call(null,hiccups.runtime.re_tag,hiccups.runtime.as_str.call(null,tag));
+var _ = cljs.core.nth.call(null,vec__15469,0,null);
+var tag__$1 = cljs.core.nth.call(null,vec__15469,1,null);
+var id = cljs.core.nth.call(null,vec__15469,2,null);
+var class$ = cljs.core.nth.call(null,vec__15469,3,null);
 var tag_attrs = cljs.core.ObjMap.fromObject(["\uFDD0'id","\uFDD0'class"],{"\uFDD0'id":id,"\uFDD0'class":(cljs.core.truth_(class$)?class$.replace("."," "):null)});
 var map_attrs = cljs.core.first.call(null,content);
 if(cljs.core.map_QMARK_.call(null,map_attrs))
@@ -117,10 +117,10 @@ if(cljs.core.map_QMARK_.call(null,map_attrs))
 * Render a tag vector as a HTML element.
 */
 hiccups.runtime.render_element = (function render_element(element){
-var vec__43155 = hiccups.runtime.normalize_element.call(null,element);
-var tag = cljs.core.nth.call(null,vec__43155,0,null);
-var attrs = cljs.core.nth.call(null,vec__43155,1,null);
-var content = cljs.core.nth.call(null,vec__43155,2,null);
+var vec__15471 = hiccups.runtime.normalize_element.call(null,element);
+var tag = cljs.core.nth.call(null,vec__15471,0,null);
+var attrs = cljs.core.nth.call(null,vec__15471,1,null);
+var content = cljs.core.nth.call(null,vec__15471,2,null);
 if(cljs.core.truth_((function (){var or__3824__auto__ = content;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;

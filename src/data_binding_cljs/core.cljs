@@ -158,6 +158,14 @@
                        (let [newval (jq/val (jq/$ node))]
                          (reset! bound newval)))))))
 
+(defmethod apply-single-binding [:INPUT :checkbox]
+  [node bound]
+  (let [current @bound]
+    (-> (jq/$ node)
+      (jq/attr :checked current)
+      (jq/on :change (fn [e]
+                       (let [newval (jq/attr (jq/$ node) "checked")]
+                         (reset! bound newval)))))))
 
 (defmethod apply-single-binding :default
   [node bound]
@@ -179,32 +187,57 @@
 
 ; Application specific code
 
-(defrecord Person [first last])
+(defn mk-uid [model]
+  (-> model gensym name))
 
-(defn full-name [person]
-  (str @(:first person) \space @(:last person)))
+(defrecord TodoItem [uid desc done?])
 
-(defn greeting-template
-  [person]
-  (data-binding ["#first" (:first person)
-                 "#last" (:last person)]
+(defn todo
+  [desc done?]
+  (TodoItem. (mk-uid "todo") (bindable desc) (bindable done?)))
+
+(defn done?
+  [t] @(:done? t))
+
+(defn todo-template
+  [td]
+  (data-binding ["#desc" (:desc td)
+                 "#done" (:done? td)]
     (html
       [:div
-       [:span
-        [:input#first {:type :text}]
-        [:input#last {:type :text}]]
-       [:h1 (str "Hello, " (full-name person) "!")]])))
+       [:input#done {:type :checkbox}]
+       [:input#desc {:type :text}]])))
 
+(def todo-items
+  (bindable (list (todo "Write data-binding framework" true)
+                  (todo "Make todo app example" false)
+                  (todo "Extend data-binding framework" false))))
 
 (def $main (jq/$ "#main"))
 
-(def me (Person. (bindable "Simon") (bindable "Hicks") 1))
-(def princess (Person. (bindable "Linda") (bindable "Guyse") 2))
+; FIXME Find a way to abstract list making into it's own concept
+;
+; it's easy to do something like a with-list macro, but (since it's a macro)
+; it needs to be in a seperate file.
+;
+; maybe a deftag macro which would allow the user to define tag extensions (like with-list or whatever)
+; ... that would mean deftags and deftemplates would need to be in seperate files, but at least that's a
+; clear separation...
+(defn todo-list-template
+  [todo-list]
+  (let [wrapper (jq/$ (html [:div]))]
+    (doseq [todo-item @todo-list]
+      (jq/append wrapper (todo-template todo-item)))
+    wrapper))
 
-(let [node1 (render (greeting-template me))
-      node2 (render (greeting-template princess))]
+(deftemplate todo-list-summary
+  [todo-list]
+  [:h1
+   (str (count (filter done? @todo-list)) " items finished")])
+
+(let [summary-node (render (todo-list-summary todo-items))
+      list-node (render (todo-list-template todo-items))]
   (-> $main
-    (jq/append node1)
-    (jq/append node2)))
-
+    (jq/append summary-node)
+    (jq/append list-node)))
 
