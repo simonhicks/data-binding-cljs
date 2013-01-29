@@ -1,0 +1,57 @@
+Random concepts...
+
+change from `data-bindings` to `view-bindings`, and make the first string an event spec (like jquery
+delegate (then use delegate))
+
+Then snippets can easily be defined as functions, which act as combinators by appling view-bindings
+(or possibly even something else, like wrapping with more content or modifying in some other way)
+
+widgets, views, templates and even whole pages can then be composed with functions acting as the
+html tag extensions I previously envisaged.
+
+TODO
+
+- split core out into utils, framework and application code
+- make some sort of plan for handling lists
+
+REQUIREMENTS
+
+- Must be templating language independent
+- Must handle a deref'd Bindable and a bound Bindable in the same template without an infinite loop
+- Must support all types of input, textarea, etc. 
+- Should replace all the current state of the inputs, textarea, etc. on rerender
+- Should maintain focus on rerender
+- Should allow additional configuration (ie. change/keyup/other events etc.)
+
+Implementation details.
+
+IBindable should include methods for setting and getting while handling the appropriate callback
+stuff as detailed in the comments below. Re-rendering can continue to be handled by the current
+system.
+
+`Bindable` objects should also implement IDeref so they can be used with deref (ie @) as seen in 
+the existing template. (along with other obvious stuff like the printable protocols and IMeta)
+
+Bindings can also be created using the data-bindings macro. This performs the following series of
+steps:
+
+1. executes the code it's given and passes it to jayq.core/$
+
+2. `-get`s the values from the bound IBindable objects and uses some helper function to set the
+   appropriate view elements. Since this all happens inside the render operation, the dynamic vars
+   will all be set so as to register the template for re-rendering on change (just as when a
+   bindable is accessed directly inside the template.
+
+3. sets up the onchange handlers for the template to use the bindable's `-set` method.
+
+With the current setup, this will work either inside the template fn or outside the template with
+any library :)
+
+
+Helpers
+
+Can also implement some helpers for creating more complex bindables, like a `bindable-fn` macro:
+
+   (bindable-fn
+     (get [] (blah blah blah))
+     (set [v] (blah blah blah v)))
