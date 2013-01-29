@@ -2,68 +2,9 @@
   (:require [jayq.core :as jq]
             [hiccups.runtime :as hiccups])
   (:use-macros [hiccups.core :only (html)]
-               [data-binding-cljs.macros :only (deftemplate render render* data-binding)]))
-
-; Random concepts...
-;
-; change from `data-bindings` to `view-bindings`, and make the first string an event spec (like jquery
-; delegate (then use delegate))
-;
-; Then snippets can easily be defined as functions, which act as combinators by appling view-bindings
-; (or possibly even something else, like wrapping with more content or modifying in some other way)
-;
-; widgets, views, templates and even whole pages can then be composed with functions acting as the
-; html tag extensions I previously envisaged.
-
-; TODO
-;
-; - split this out into utils, framework and application code
-; - refactor it so it's not quite so ugly
-; - make some sort of plan for handling lists
-
-; REQUIREMENTS
-;
-; - Must be templating language independent
-; - Must handle a deref'd Bindable and a bound Bindable in the same template without an infinite loop
-; - Must support all types of input, textarea, etc. 
-; - Should replace all the current state of the inputs, textarea, etc. on rerender
-; - Should maintain focus on rerender
-; - Should allow additional configuration (ie. change/keyup/other events etc.)
-;
-; Implementation details.
-;
-; IBindable should include methods for setting and getting while handling the appropriate callback
-; stuff as detailed in the comments below. Re-rendering can continue to be handled by the current
-; system.
-;
-; `Bindable` objects should also implement IDeref so they can be used with deref (ie @) as seen in 
-; the existing template. (along with other obvious stuff like the printable protocols and IMeta)
-;
-; Bindings can also be created using the data-bindings macro. This performs the following series of
-; steps:
-;
-; 1. executes the code it's given and passes it to jayq.core/$
-;
-; 2. `-get`s the values from the bound IBindable objects and uses some helper function to set the
-;    appropriate view elements. Since this all happens inside the render operation, the dynamic vars
-;    will all be set so as to register the template for re-rendering on change (just as when a
-;    bindable is accessed directly inside the template.
-;
-; 3. sets up the onchange handlers for the template to use the bindable's `-set` method.
-;
-; With the current setup, this will work either inside the template fn or outside the template with
-; any library :)
-;
-;
-; Helpers
-;
-; Can also implement some helpers for creating more complex bindables, like a `bindable-fn` macro:
-;
-;   (bindable-fn
-;     (get [] (blah blah blah))
-;     (set [v] (blah blah blah v)))
-;
-
+               [data-binding-cljs.macros :only (deftemplate render render*
+                                                data-binding model-bind ;wrap
+                                                )]))
 
 ;; UTILITIES
 (defn log [& stuff]
@@ -184,6 +125,27 @@
   ([x & {:keys [meta validator]}]
     (Bindable. x meta validator nil)))
 
+(defn wrap [content & {:keys [with at]}]
+  (let [wrapper (jq/$ with)
+        loc (if (exist? at)
+              (jq/find wrapper at)
+              wrapper)]
+     (doseq [form content]
+       (jq/append loc form))
+     wrapper))
+
+(defn insert
+  [parent content & {:keys [at before after]}]
+  (let [insertion-method (cond
+                           at     #(.replaceWith %1 %2)
+                           before #(.before %1 %2)
+                           after  #(.after %1 %2))
+        wrapper (jq/$ parent)]
+    (-> wrapper
+      (jq/find (or at before after))
+      (insertion-method content))
+    wrapper))
+
 
 ; Application specific code
 
@@ -197,16 +159,25 @@
   (TodoItem. (mk-uid "todo") (bindable desc) (bindable done?)))
 
 (defn done?
-  [t] @(:done? t))
+  [t]
+  (deref (:done? t)))
+
+(defn remaining-items
+  [tds]
+  (->> tds
+    (filter done?)
+    count))
+
+(defn bind-todo
+  [content td]
+  (model-bind content td ".desc" :desc, ".done" :done?))
 
 (defn todo-template
   [td]
-  (data-binding ["#desc" (:desc td)
-                 "#done" (:done? td)]
-    (html
-      [:div
-       [:input#done {:type :checkbox}]
-       [:input#desc {:type :text}]])))
+  (-> (html [:div
+             [:input.done {:type :checkbox}]
+             [:input.desc {:type :text}]])
+    (bind-todo td)))
 
 (def todo-items
   (bindable (list (todo "Write data-binding framework" true)
@@ -215,29 +186,20 @@
 
 (def $main (jq/$ "#main"))
 
-; FIXME Find a way to abstract list making into it's own concept
-;
-; it's easy to do something like a with-list macro, but (since it's a macro)
-; it needs to be in a seperate file.
-;
-; maybe a deftag macro which would allow the user to define tag extensions (like with-list or whatever)
-; ... that would mean deftags and deftemplates would need to be in seperate files, but at least that's a
-; clear separation...
-(defn todo-list-template
-  [todo-list]
-  (let [wrapper (jq/$ (html [:div]))]
-    (doseq [todo-item @todo-list]
-      (jq/append wrapper (todo-template todo-item)))
-    wrapper))
-
 (deftemplate todo-list-summary
   [todo-list]
-  [:h1
-   (str (count (filter done? @todo-list)) " items finished")])
+  [:h1 (str (remaining-items @todo-list) " items finished")])
 
-(let [summary-node (render (todo-list-summary todo-items))
-      list-node (render (todo-list-template todo-items))]
-  (-> $main
-    (jq/append summary-node)
-    (jq/append list-node)))
+(defn todo-list-view [items]
+  (-> (for [item @items]
+        (render (todo-template item)))
 
+    (wrap :with (render
+                  (html [:div#not-list
+                         [:div#summary]
+                         [:div#list]]))
+          :at :#list)
+
+    (insert (render (todo-list-summary items)) :at :#summary)))
+
+(jq/append $main (render (todo-list-view todo-items)))
