@@ -1,22 +1,7 @@
 (ns data-binding-cljs.core
-  (:require [jayq.core :as jq]
-            [hiccups.runtime :as hiccups])
-  (:use-macros [hiccups.core :only (html)]
-               [data-binding-cljs.macros :only (deftemplate render render*
-                                                data-binding model-bind ;wrap
-                                                )]))
-
-;; UTILITIES
-(defn log [& stuff]
-  (.log js/console (apply str stuff)))
-
-(defn exist?
-  "returns true, if x is neither null nor undefined"
-  ([x] (and (not= js/undefined x) (not= nil x)))
-  ([& xs] (every? exist? xs)))
-
-
-; Core framework code
+  (:require [jayq.core :as jq])
+  (:use [data-binding-cljs.util :only (log exist?)])
+  (:use-macros [data-binding-cljs.macros :only (render*)]))
 
 ; used to hold the code that should be executed to re-render the node currently being rendered
 (declare ^:dynamic *template-id*)
@@ -108,6 +93,8 @@
                        (let [newval (jq/attr (jq/$ node) "checked")]
                          (reset! bound newval)))))))
 
+; TODO handle more input types
+
 (defmethod apply-single-binding :default
   [node bound]
   (let [current @bound]
@@ -124,82 +111,3 @@
     (Bindable. x nil nil nil))
   ([x & {:keys [meta validator]}]
     (Bindable. x meta validator nil)))
-
-(defn wrap [content & {:keys [with at]}]
-  (let [wrapper (jq/$ with)
-        loc (if (exist? at)
-              (jq/find wrapper at)
-              wrapper)]
-     (doseq [form content]
-       (jq/append loc form))
-     wrapper))
-
-(defn insert
-  [parent content & {:keys [at before after]}]
-  (let [insertion-method (cond
-                           at     #(.replaceWith %1 %2)
-                           before #(.before %1 %2)
-                           after  #(.after %1 %2))
-        wrapper (jq/$ parent)]
-    (-> wrapper
-      (jq/find (or at before after))
-      (insertion-method content))
-    wrapper))
-
-
-; Application specific code
-
-(defn mk-uid [model]
-  (-> model gensym name))
-
-(defrecord TodoItem [uid desc done?])
-
-(defn todo
-  [desc done?]
-  (TodoItem. (mk-uid "todo") (bindable desc) (bindable done?)))
-
-(defn done?
-  [t]
-  (deref (:done? t)))
-
-(defn remaining-items
-  [tds]
-  (->> tds
-    (filter done?)
-    count))
-
-(defn bind-todo
-  [content td]
-  (model-bind content td ".desc" :desc, ".done" :done?))
-
-(defn todo-template
-  [td]
-  (-> (html [:div
-             [:input.done {:type :checkbox}]
-             [:input.desc {:type :text}]])
-    (bind-todo td)))
-
-(def todo-items
-  (bindable (list (todo "Write data-binding framework" true)
-                  (todo "Make todo app example" false)
-                  (todo "Extend data-binding framework" false))))
-
-(def $main (jq/$ "#main"))
-
-(deftemplate todo-list-summary
-  [todo-list]
-  [:h1 (str (remaining-items @todo-list) " items finished")])
-
-(defn todo-list-view [items]
-  (-> (for [item @items]
-        (render (todo-template item)))
-
-    (wrap :with (render
-                  (html [:div#not-list
-                         [:div#summary]
-                         [:div#list]]))
-          :at :#list)
-
-    (insert (render (todo-list-summary items)) :at :#summary)))
-
-(jq/append $main (render (todo-list-view todo-items)))

@@ -6,7 +6,7 @@
   `(defn ~name ~args (html ~form)))
 
 (defmacro data-binding
-  [content & {:as bindings}]
+  [content bindings]
   `(let [node# (jayq.core/$ ~content)]
      (doseq [[selector# bound#] ~bindings]
        (-> node#
@@ -19,11 +19,11 @@
   bind-map should be a map of jquery selectors to functions. Each
   jquery selector will be bound to the bindable returned by calling the
   associated function on `instance`"
-  [content instance & {:as bind-map}]
+  [content instance bind-map]
   (let [bindings (reduce (fn [acc [sel func]]
                            (concat acc [sel (list func instance)]))
                          '() bind-map)]
-    `(data-binding ~content ~@bindings)))
+    `(data-binding ~content (hash-map ~@bindings))))
 
 (defmacro render*
   [code code-as-fn]
